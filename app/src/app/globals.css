@@ -1,4 +1,7 @@
 @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-  
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply w-full p-4 md:max-w-7xl mx-auto py-20;
+}

@@ -77,6 +77,7 @@ type Status =
   | "Accepted on L1"
   | "Rejected"
   | "Reverted";
+
 type TransactionType =
   | "DEPLOY"
   | "INVOKE"
