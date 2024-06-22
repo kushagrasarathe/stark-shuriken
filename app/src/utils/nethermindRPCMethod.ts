@@ -4,11 +4,12 @@ import {
   AccountInvocationItem,
   SimulateTransactionResponse,
   SimulatedTransaction,
+  CallData,
 } from "starknet";
 import dotenv from "dotenv";
 dotenv.config();
 
-interface SimulateTransactionArgs {
+export interface SimulateTransactionArgs {
   blockId: BlockIdentifier; // could be hash , id , or "latest" / "pending"
   transaction: AccountInvocationItem;
   skipExecute?: boolean;
@@ -30,14 +31,19 @@ export const simulateTransaction = async ({
   skipExecute,
   skipFeeCharge,
   skipValidate,
-}: SimulateTransactionArgs): Promise<SimulatedTransaction> => {
-  const response = await rpcProvider.simulateTransaction([transaction], {
-    blockIdentifier: blockId,
-    skipExecute,
-    skipFeeCharge,
-    skipValidate,
-  });
-  return response[0];
+}: SimulateTransactionArgs): Promise<SimulatedTransaction | Error> => {
+  try {
+    const response = await rpcProvider.simulateTransaction([transaction], {
+      blockIdentifier: blockId,
+      skipExecute,
+      skipFeeCharge,
+      skipValidate,
+    });
+    return response[0];
+  } catch (e) {
+    const error = e as Error;
+    return error;
+  }
 };
 
 // get transaction trace
