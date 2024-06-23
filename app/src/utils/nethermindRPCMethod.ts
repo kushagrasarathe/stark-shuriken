@@ -31,7 +31,11 @@ export const simulateTransaction = async ({
   skipExecute,
   skipFeeCharge,
   skipValidate,
-}: SimulateTransactionArgs): Promise<SimulatedTransaction | Error> => {
+}: SimulateTransactionArgs): Promise<{
+  tx?: SimulatedTransaction;
+  isSuccess: boolean;
+  error?: Error;
+}> => {
   try {
     const response = await rpcProvider.simulateTransaction([transaction], {
       blockIdentifier: blockId,
@@ -39,10 +43,13 @@ export const simulateTransaction = async ({
       skipFeeCharge,
       skipValidate,
     });
-    return response[0];
+    return {
+      tx: response[0],
+      isSuccess: true,
+    };
   } catch (e) {
     const error = e as Error;
-    return error;
+    return { error, isSuccess: false };
   }
 };
 
