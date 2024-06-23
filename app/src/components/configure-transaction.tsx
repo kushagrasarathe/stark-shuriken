@@ -1,17 +1,17 @@
 "use client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
+import { startSimulateTransaction } from "@/utils/apiMethod";
+import { SimulateTransactionArgs } from "@/utils/nethermindRPCMethod";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { AccountInvocationItem, TransactionType } from "starknet";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
 import { Textarea } from "./ui/textarea";
-import { SimulateTransactionArgs } from "@/utils/nethermindRPCMethod";
-import { AccountInvocationItem, TransactionType } from "starknet";
-import { startSimulateTransaction } from "@/utils/apiMethod";
-import { useRouter } from "next/navigation";
 
 const netwroks = ["mainnet", "sepolia"];
 
@@ -120,7 +120,7 @@ export default function ConfigureTransaction() {
 
   return (
     <div className="flex items-start justify-normal w-full gap-4 relative">
-      <div className="flex flex-col w-full gap-4 sticky top-8">
+      <div className="flex flex-col w-full gap-4 sticky top-8 mt-3">
         <div>
           <div className="text-2xl font-semibold">Stark Shuriken</div>
           <div className="text-sm font-light text-neutral-500">
@@ -210,7 +210,7 @@ export default function ConfigureTransaction() {
         </Card>
       </div>
 
-      <Card className="w-full rounded-lg p-2 bg-indigo-500/5">
+      <Card className="w-full rounded-lg p-2 bg-indigo-500/5 mt-20 ">
         <CardHeader>
           <CardTitle className="font-semibold text-lg">
             Transaction Parameters

@@ -1,3 +1,4 @@
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -7,9 +8,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getAllSimulated } from "@/utils/apiMethod";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default function page() {
+interface TransactionRequestIds {
+  requestIds: string[];
+}
+
+export default function Page() {
+  const [allTransactions, setAllTransactions] =
+    useState<TransactionRequestIds | null>(null);
+
+  async function getAllSimulations() {
+    const data = await getAllSimulated();
+    if (data) {
+      setAllTransactions(data);
+    }
+  }
+
+  useEffect(() => {
+    if (!allTransactions) {
+      getAllSimulations();
+    }
+  }, []);
+
   return (
     <Card className="w-full rounded-lg p-2 bg-indigo-500/5">
       <CardHeader>
@@ -27,14 +50,16 @@ export default function page() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">
-                <Link href={`/simulator/${23}`}>INV001</Link>
-              </TableCell>
-              <TableCell>Paid</TableCell>
-              <TableCell>Credit Card</TableCell>
-              <TableCell className="text-right">$250.00</TableCell>
-            </TableRow>
+            {allTransactions?.requestIds.map((item, idx) => (
+              <TableRow key={idx}>
+                <TableCell className="font-medium">
+                  <Link href={`/simulator/${23}`}>item</Link>
+                </TableCell>
+                <TableCell>Paid</TableCell>
+                <TableCell>Credit Card</TableCell>
+                <TableCell className="text-right">$250.00</TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </CardContent>

@@ -41,6 +41,8 @@ export const getSimulateTransactionResponse = async (
       method: "GET",
     });
 
+    console.log(response);
+
     const data = await response.json();
     console.log(data);
     return data as SimulationResponse;

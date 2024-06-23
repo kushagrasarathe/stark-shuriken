@@ -1,47 +1,32 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn, formatTimestamp, formatTimestampToDate } from "@/lib/utils";
-import React from "react";
 
+import { SimulationResponse } from "@/types";
 import CalldataTabs from "./calldata-tabs";
 import TabRow from "./tab-row";
 import { Card } from "./ui/card";
 
-const SimulationDetailsTabs: React.FC = () => {
+const SimulationDetailsTabs = ({
+  simulationDetails,
+}: {
+  simulationDetails: SimulationResponse;
+}) => {
   // const { transactionDetails } = useTransactionsStore();
   const transactionDetails = {
-    blockNumber: 1111111,
-    timestamp: 1681312000,
-    actualFeeUSD: "1.23",
-    max_fee: "0",
-    gasConsumed: "0",
-    sender_address: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    calldata: [
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "0x00000",
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-    ],
-    nonce: "0x00000000000000000000000000000000000000000000000000000",
-    position: 1,
-    version: 1,
-    signature: [
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "0x00000000",
-      "0x0000000000000000",
-      "0x0000000000000000000000000000000000000000000000000",
-      "0x000000000",
-    ],
-    events: [
-      {
-        "EVENT NAME": "Transfer",
-        "EVENT ARGS":
-          "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-      },
-      {
-        "EVENT NAME": "Transfer",
-        "EVENT ARGS":
-          "0x000000000000000000000000000000000000000000000000000000000000000000000",
-      },
-    ],
+    blockNumber: simulationDetails?.simulateArgs.blockId || "",
+    timestamp: simulationDetails?.timestamp,
+    max_fee: simulationDetails?.simulateArgs.transaction.maxFee || "0",
+    sender_address:
+      // @ts-ignore
+      simulationDetails?.simulateArgs.transaction.contractAddress || "-",
+    calldata:
+      // @ts-ignore
+      simulationDetails?.simulateArgs.transaction?.calldata || [],
+    nonce: simulationDetails?.simulateArgs.transaction?.nonce || 0,
+    version: simulationDetails?.simulateArgs.transaction.version || 0,
+    signature:
+      (simulationDetails?.simulateArgs.transaction.signature as []) || [],
+    // events: simulationDetails.
   };
 
   const tabs = ["Overview", "Events"];
@@ -52,9 +37,7 @@ const SimulationDetailsTabs: React.FC = () => {
       TIMESTAMP: `${formatTimestamp(
         transactionDetails?.timestamp as number
       )} ( ${formatTimestampToDate(transactionDetails?.timestamp as number)} )`,
-      "ACTUAL FEE": transactionDetails?.actualFeeUSD,
       "MAX FEE": transactionDetails?.max_fee || "-",
-      "GAS CONSUMED": transactionDetails?.gasConsumed || "-",
       "CONTRACT ADDRESS": transactionDetails?.sender_address || "-",
     },
   ];
@@ -97,19 +80,14 @@ const SimulationDetailsTabs: React.FC = () => {
           <div className="flex items-center justify-stretch text-sm">
             <div className="w-3/12">NONCE:</div>
             <div className="w-9/12 border-b py-2 border-gray-600">
-              {transactionDetails?.nonce || "-"}
+              {transactionDetails?.nonce.toLocaleString() || "-"}
             </div>
           </div>
-          <div className="flex items-center justify-stretch text-sm">
-            <div className="w-3/12">POSITION:</div>
-            <div className="w-9/12 border-b py-2 border-gray-600">
-              {transactionDetails?.position || "-"}
-            </div>
-          </div>
+
           <div className="flex items-center justify-stretch text-sm">
             <div className="w-3/12">VERSION:</div>
             <div className="w-9/12 border-b py-2 border-gray-600">
-              {transactionDetails?.version || "-"}
+              {transactionDetails?.version.toString() || "-"}
             </div>
           </div>
 
@@ -132,11 +110,11 @@ const SimulationDetailsTabs: React.FC = () => {
           </div>
         </div>
       </TabsContent>
-      <TabsContent value={"Events"}>
-        {/* <div>
+      {/* <TabsContent value={"Events"}>
+        <div>
           <EventsTable events={transactionDetails?.events || []} />
-        </div> */}
-      </TabsContent>
+        </div> 
+      </TabsContent> */}
     </Tabs>
   );
 };
