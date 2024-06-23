@@ -1,9 +1,10 @@
 "use client";
 
+import SimulationDetailsTabs from "@/components/simulation-details-tabs";
 import TransactionBadge from "@/components/transaction-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 export default function SimulationDetails() {
   return (
@@ -24,7 +25,7 @@ export default function SimulationDetails() {
         <div className="flex items-center justify-between md:max-w-xl">
           <div className="space-y-1">
             <div className="text-sm text-neutral-500">TYPE</div>
-            <TransactionBadge type={"DEPLOY_ACCOUNT"} />
+            <TransactionBadge type={"INVOKE"} />
           </div>
           <div className="space-y-1">
             <div className="text-sm text-neutral-500">TIMESTAMP</div>
@@ -35,21 +36,31 @@ export default function SimulationDetails() {
         <div className="space-y-1">
           <div className="text-sm text-neutral-500">STATUS</div>
           <div className="relative flex items-center">
+            <Badge className="group flex w-fit cursor-pointer items-center gap-2 px-3 py-1.5 hover:pr-5 bg-red-600 text-white hover:bg-red-700">
+              <X className="size-4 group-hover:translate-x-1" />
+              <div className="text-xs font-normal group-hover:translate-x-1">
+                Failed
+              </div>
+            </Badge>
             <Badge className="group flex w-fit cursor-pointer items-center gap-2 px-3 py-1.5 hover:pr-5 bg-green-700 text-white hover:bg-green-800">
               <Check className="size-4 group-hover:translate-x-1" />
               <div className="text-xs font-normal group-hover:translate-x-1">
-                ACCEPTED_ON_L2
+                Success
               </div>
             </Badge>
-            {/* <Separator className="w-10 bg-neutral-400 h-px" />
-
-            <div className="flex size-8 items-center justify-center rounded-full border border-gray-400 text-gray-400">
-              <LucideLoader2 className="size-7 animate-spin" />
-            </div> */}
           </div>
         </div>
 
-        <div>{/* <TransactionDetailsTabs /> */}</div>
+        <div className="space-y-1">
+          <div className="text-sm text-neutral-500">REASON</div>
+          <div className="relative flex items-center bg-neutral-800 text-white p-3 px-4 rounded-md">
+            The transaction failed due to an invalid transaction nonce
+          </div>
+        </div>
+
+        <div>
+          <SimulationDetailsTabs />
+        </div>
       </CardContent>
     </Card>
   );

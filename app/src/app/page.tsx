@@ -1,33 +1,11 @@
 "use client";
+"use client";
 import ConfigureTransaction from "@/components/configure-transaction";
 import { startSimulateTransaction } from "@/utils/apiMethod";
-import Image from "next/image";
 import { TransactionType } from "starknet";
 
 export default function Home() {
   const handleSimulate = async () => {
-    // await startSimulateTransaction({
-    //   blockId: "latest",
-    //   transaction: {
-    //     type: TransactionType.INVOKE,
-    //     version: "0x1",
-    //     contractAddress:
-    //       "0x00fff107e2403123c7df78d91728a7ee5cfd557aec0fa2d2bdc5891c286bbfff",
-    //     entrypoint: "burn",
-    //     calldata: ["0xfa98", "0x00"],
-    //     maxFee: "0x0",
-    //     signature: [
-    //       "0x1",
-    //       "0x7811a391737bd7de21fa99e5e99bfb5fb8105d9c46f6fc05949f619aa8e5d17",
-    //       "0x3dd4032745750c7c6026c59fa1508dc2548c447b990c9600654fd2bcb155c3d",
-    //     ],
-    //     nonce: "0x0",
-    //   },
-    //   skipExecute: false,
-    //   skipFeeCharge: false,
-    //   skipValidate: false,
-    // });
-
     await startSimulateTransaction({
       blockId: "75682",
       transaction: {
