@@ -48,7 +48,7 @@ export default function SimulationDetails() {
 
   if (isLoading) {
     return (
-      <Card className="w-full rounded-lg p-2 bg-indigo-500/5">
+      <Card className="w-full rounded-lg p-2 bg-indigo-500/5 min-h-screen z-30">
         <CardContent className="flex justify-center items-center h-64">
           <div className="text-lg">Loading simulation details...</div>
         </CardContent>
@@ -57,7 +57,7 @@ export default function SimulationDetails() {
   }
 
   return (
-    <Card className="w-full rounded-lg p-2 bg-indigo-500/5">
+    <Card className="w-full rounded-lg p-2 bg-indigo-500/5 backdrop-blur-2xl">
       <CardHeader>
         <CardTitle className="font-normal">Simulation Details</CardTitle>
       </CardHeader>

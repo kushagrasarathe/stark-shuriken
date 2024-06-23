@@ -1,5 +1,8 @@
+import Header from "@/components/header";
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
+import Image from "next/image";
+import logo from "../../public/shuriken-warrior.jpg";
 import "./globals.css";
 
 const font = Raleway({ subsets: ["latin"] });
@@ -16,7 +19,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={font.className}>{children}</body>
+      <body className={font.className}>
+        <div className="relative">
+          <Header />
+          <div className="w-full p-4 md:max-w-7xl mx-auto py-10">
+            {children}
+          </div>
+          <Image
+            src={logo}
+            alt="logo"
+            className=" fixed bottom-0 right-10 -z-10"
+          />
+        </div>
+      </body>
     </html>
   );
 }

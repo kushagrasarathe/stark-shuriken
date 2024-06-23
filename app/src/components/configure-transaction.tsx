@@ -4,9 +4,11 @@ import { cn } from "@/lib/utils";
 import { startSimulateTransaction } from "@/utils/apiMethod";
 import { SimulateTransactionArgs } from "@/utils/nethermindRPCMethod";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AccountInvocationItem, TransactionType } from "starknet";
+import logo from "../../public/shuriken-warrior-flip.jpg";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
@@ -129,9 +131,10 @@ export default function ConfigureTransaction() {
     <div className="flex items-start justify-normal w-full gap-4 relative">
       <div className="flex flex-col w-full gap-4 sticky top-8 mt-3">
         <div>
-          <div className="text-2xl font-semibold">Stark Shuriken</div>
-          <div className="text-sm font-light text-neutral-500">
-            Simulate transactions on StarkNet
+          {/* <div className="text-2xl font-semibold">Stark Shuriken</div> */}
+          <div className="text-sm font-light text-neutral-800">
+            Simulate transactions, get human readable explainations and debug
+            with ease {`:)`}
           </div>
         </div>
         <Card className="w-full rounded-lg p-2 bg-indigo-500/5">
@@ -215,9 +218,14 @@ export default function ConfigureTransaction() {
             )}
           </CardContent>
         </Card>
+        <Image
+          src={logo}
+          alt="logo"
+          className=" size-40 -rotate-[30deg]  -z-10"
+        />
       </div>
 
-      <Card className="w-full rounded-lg p-2 bg-indigo-500/5 mt-20 ">
+      <Card className="w-full rounded-lg p-2 bg-indigo-500/5 mt-12 backdrop-blur-3xl ">
         <CardHeader>
           <CardTitle className="font-semibold text-lg">
             Transaction Parameters
