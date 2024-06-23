@@ -8,19 +8,36 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
 import { Textarea } from "./ui/textarea";
+import { SimulateTransactionArgs } from "@/utils/nethermindRPCMethod";
+import { AccountInvocationItem, TransactionType } from "starknet";
+import { startSimulateTransaction } from "@/utils/apiMethod";
+import { useRouter } from "next/navigation";
 
 const netwroks = ["mainnet", "sepolia"];
 
-const transactionTypes = ["INVOKE", "DECLARE", "DEPLOY_ACCOUNT"];
+const transactionTypes: Array<
+  | TransactionType.INVOKE
+  | TransactionType.DECLARE
+  | TransactionType.DEPLOY_ACCOUNT
+> = [
+  TransactionType.INVOKE,
+  TransactionType.DECLARE,
+  TransactionType.DEPLOY_ACCOUNT,
+];
 
 export default function ConfigureTransaction() {
+  const router = useRouter();
+
   const [selectedNetwork, setSelectedNetwork] = useState<string>("mainnet");
   const [usePendingBlock, setUsePendingBlock] = useState<boolean>(false);
   const [skipFlags, setSkipFlags] = useState<boolean>(false);
   const [selectedDataInputType, setSelectedDataInputType] =
     useState<string>("raw");
-  const [selectedTransactionType, setSelectedTransactionType] =
-    useState("INVOKE");
+  const [selectedTransactionType, setSelectedTransactionType] = useState<
+    | TransactionType.INVOKE
+    | TransactionType.DECLARE
+    | TransactionType.DEPLOY_ACCOUNT
+  >(TransactionType.INVOKE);
   const [contractAddress, setContractAddress] = useState<string>("");
   const [rawInputData, setRawInputData] = useState<string>("");
   const [blockNumber, setBlockNumber] = useState<string>("");
@@ -32,38 +49,77 @@ export default function ConfigureTransaction() {
   const [classHash, setClassHash] = useState<string>("");
   const [constructorCalldata, setConstructorCalldata] = useState<string>("");
   const [addressSalt, setAddressSalt] = useState<string>("");
-  const [nonce, setNonce] = useState<string>("");
-  const [maxFee, setMaxFee] = useState<string>("");
-  const [version, setVersion] = useState<string>("");
+  const [nonce, setNonce] = useState<string>("0x0");
+  const [maxFee, setMaxFee] = useState<string>("0x0");
+  const [version, setVersion] = useState<string>("0x1");
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Perform form submission logic here
-    console.log({
-      selectedNetwork,
-      usePendingBlock,
-      skipFlags,
-      selectedDataInputType,
-      selectedTransactionType,
-      contractAddress,
-      rawInputData,
-      blockNumber,
-      signature,
-      calldata,
-      entrypoint,
-      senderAddress,
-      compiledHash,
-      classHash,
-      constructorCalldata,
-      addressSalt,
-    });
-    console.log("Form submitted");
+
+    let transaction: AccountInvocationItem;
+
+    if (selectedTransactionType === TransactionType.INVOKE) {
+      transaction = {
+        type: selectedTransactionType,
+        version,
+        contractAddress: contractAddress,
+        calldata: JSON.parse(calldata),
+        maxFee,
+        signature: JSON.parse(signature),
+        nonce,
+      };
+    } else if (selectedTransactionType === TransactionType.DECLARE) {
+      transaction = {
+        type: selectedTransactionType,
+        contract: {
+          program: "",
+          entry_points_by_type: {
+            CONSTRUCTOR: [],
+            L1_HANDLER: [],
+            EXTERNAL: [],
+          },
+          abi: [],
+        },
+        senderAddress,
+        compiledClassHash: compiledHash,
+        signature: signature.split(","),
+        nonce,
+      };
+    } else {
+      transaction = {
+        type: selectedTransactionType,
+        version,
+        classHash,
+        constructorCalldata: JSON.parse(constructorCalldata),
+        addressSalt,
+        maxFee,
+        signature: JSON.parse(signature),
+        nonce,
+      };
+    }
+
+    console.log(transaction);
+    const simulateParams: SimulateTransactionArgs = {
+      blockId: usePendingBlock ? "latest" : blockNumber,
+      transaction: transaction,
+      skipExecute: skipFlags,
+      skipFeeCharge: skipFlags,
+      skipValidate: skipFlags,
+    };
+    console.log(simulateParams);
+    const response = await startSimulateTransaction(simulateParams);
+
+    if (response) {
+      const requestId = response.requestId;
+      console.log(requestId);
+      router.push(`/simulate/${requestId}`);
+    } else {
+      console.log("error");
+    }
   };
 
   return (
-    <div
-      //   onSubmit={handleSubmit}
-      className="flex items-start justify-normal w-full gap-4 relative"
-    >
+    <div className="flex items-start justify-normal w-full gap-4 relative">
       <div className="flex flex-col w-full gap-4 sticky top-8">
         <div>
           <div className="text-2xl font-semibold">Stark Shuriken</div>
@@ -185,7 +241,7 @@ export default function ConfigureTransaction() {
             </div>
           </div>
           <div className="space-y-2">
-            <div>Block Number</div>
+            <div>Block Number / Hash</div>
             <Input
               disabled={usePendingBlock}
               placeholder="e.g: 3232882"
@@ -224,35 +280,31 @@ export default function ConfigureTransaction() {
               ))}
             </div>
           </div>
-
           <div className="space-y-2">
-            <div>Signature</div>
-            <Input type="number" placeholder="e.g: 3" />
-            <div className="text-xs text-neutral-500">
-              use comma for multiple values
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <div>Signature</div>
+            <div>Version</div>
             <Input
               type="text"
               placeholder="e.g: 3"
-              value={signature}
-              onChange={(e) => setSignature(e.target.value)}
+              value={version}
+              onChange={(e) => setVersion(e.target.value)}
             />
-            <div className="text-xs text-neutral-500">
-              use comma for multiple values
-            </div>
           </div>
 
-          {selectedTransactionType === "INVOKE" && (
+          {selectedTransactionType === TransactionType.INVOKE && (
             <div className="space-y-4">
+              <div className="space-y-2">
+                <div>Entrypoint</div>
+                <Input
+                  placeholder="e.g: 0x0000000000000000000000000000000000000000000"
+                  value={entrypoint}
+                  onChange={(e) => setContractAddress(e.target.value)}
+                />
+              </div>
               <div className="space-y-2">
                 <div>Calldata</div>
                 <Input
                   type="text"
-                  placeholder="enter constructor calldata"
+                  placeholder="enter calldata"
                   value={calldata}
                   onChange={(e) => setCalldata(e.target.value)}
                 />
@@ -260,18 +312,10 @@ export default function ConfigureTransaction() {
                   use comma for multiple values
                 </div>
               </div>
-              <div className="space-y-2">
-                <div>Entrypoint</div>
-                <Input
-                  placeholder="e.g: 0x0000000000000000000000000000000000000000000"
-                  value={entrypoint}
-                  onChange={(e) => setEntrypoint(e.target.value)}
-                />
-              </div>
             </div>
           )}
 
-          {selectedTransactionType === "DECLARE" && (
+          {selectedTransactionType === TransactionType.DECLARE && (
             <div className="space-y-4">
               <div className="space-y-2">
                 <div>Sender Address</div>
@@ -294,7 +338,7 @@ export default function ConfigureTransaction() {
             </div>
           )}
 
-          {selectedTransactionType === "DEPLOY_ACCOUNT" && (
+          {selectedTransactionType === TransactionType.DEPLOY_ACCOUNT && (
             <div className="space-y-4">
               <div className="space-y-2">
                 <div>Class Hash</div>
@@ -331,6 +375,19 @@ export default function ConfigureTransaction() {
           )}
 
           <div className="space-y-2">
+            <div>Signature</div>
+            <Input
+              type="text"
+              placeholder="e.g: [] "
+              value={signature}
+              onChange={(e) => setSignature(e.target.value)}
+            />
+            <div className="text-xs text-neutral-500">
+              use comma for multiple values
+            </div>
+          </div>
+
+          <div className="space-y-2">
             <div>Nonce</div>
             <Input
               type="text"
@@ -346,15 +403,6 @@ export default function ConfigureTransaction() {
               placeholder="e.g: 8000000"
               value={maxFee}
               onChange={(e) => setMaxFee(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <div>Version</div>
-            <Input
-              type="text"
-              placeholder="e.g: 3"
-              value={version}
-              onChange={(e) => setVersion(e.target.value)}
             />
           </div>
         </CardContent>

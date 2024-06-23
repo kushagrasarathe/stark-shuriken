@@ -27,7 +27,7 @@ export const startSimulateTransaction = async ({
 
     const data = await response.json();
     console.log(data);
-    return data as { reqId: string };
+    return data as { requestId: string };
   } catch (error: any) {
     console.log(error);
   }
@@ -49,13 +49,14 @@ export const getSimulateTransactionResponse = async (
   }
 };
 
-export const getAllSimualated = async () => {
+export const getAllSimulated = async () => {
   try {
     const response = await fetch(`/api/simulate`, {
       method: "GET",
     });
 
     const data = (await response.json()) as { requestIds: string[] };
+
     console.log(data);
     return data;
   } catch (error: any) {
