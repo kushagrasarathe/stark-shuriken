@@ -1,12 +1,8 @@
 "use client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
-import { startSimulateTransaction } from "@/utils/apiMethod";
-import { SimulateTransactionArgs } from "@/utils/nethermindRPCMethod";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AccountInvocationItem, TransactionType } from "starknet";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
@@ -136,17 +132,6 @@ export default function ConfigureTransaction() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // useEffect(() => {
-  //   if (contractAddress && contractAddress != "") {
-  //     getContractData();
-  //   }
-  // }, [contractAddress]);
-
-  const getContractData = async () => {
-    const contractDetails = await getContractInfo(contractAddress);
-    setContractDetails(contractDetails);
   };
 
   // useEffect(() => {
