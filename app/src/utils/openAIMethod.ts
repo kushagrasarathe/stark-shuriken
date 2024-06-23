@@ -27,7 +27,10 @@ export const parseTransactionWithLLM = async (
     const completion = await openai.chat.completions.create({
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `${simulatedTransaction.transaction_trace}` },
+        {
+          role: "user",
+          content: JSON.stringify(simulatedTransaction.transaction_trace),
+        },
       ],
       model: "gpt-3.5-turbo-16k",
     });
