@@ -28,7 +28,7 @@ export const getContractDetails = async (
     `${process.env.VOYAGER_API_URL}/contract/${contractAddress}`,
     {
       headers: {
-        "X-API-Key": process.env.VOYAGER_API_KEY,
+        "X-Api-Key": process.env.VOYAGER_API_KEY,
       },
     }
   );
@@ -41,7 +41,7 @@ export type ClassDetailType = {
   transactionHash: string;
   type: number;
   creationTimestamp: number;
-  verifiedTimestamp: string | null;
+  verifiedTimestamp: number | null;
   classAlias: string | null;
   version: string;
   byteCode: string[];
@@ -62,7 +62,7 @@ export const getClassDetails = async (
     `${process.env.VOYAGER_API_URL}/classes/${classHash}`,
     {
       headers: {
-        "X-API-Key": process.env.VOYAGER_API_KEY,
+        "X-Api-Key": process.env.VOYAGER_API_KEY,
       },
     }
   );
@@ -112,7 +112,7 @@ export const getTransactionDetails = async (transactionHash: string) => {
     `${process.env.VOYAGER_API_URL}/txns/${transactionHash}`,
     {
       headers: {
-        "X-API-Key": process.env.VOYAGER_API_KEY,
+        "X-Api-Key": process.env.VOYAGER_API_KEY,
       },
     }
   );

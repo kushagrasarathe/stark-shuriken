@@ -1,8 +1,9 @@
 "use client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
-import { startSimulateTransaction } from "@/utils/apiMethod";
+import { getContractInfo, startSimulateTransaction } from "@/utils/apiMethod";
 import { SimulateTransactionArgs } from "@/utils/nethermindRPCMethod";
+import { ClassDetailType, ContractDetailType } from "@/utils/voyagerAPIMethod";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -42,6 +43,9 @@ export default function ConfigureTransaction() {
     | TransactionType.DEPLOY_ACCOUNT
   >(TransactionType.INVOKE);
   const [contractAddress, setContractAddress] = useState<string>("");
+  const [contractDetails, setContractDetails] = useState<
+    ContractDetailType & ClassDetailType
+  >();
   const [rawInputData, setRawInputData] = useState<string>("");
   const [blockNumber, setBlockNumber] = useState<string>("");
   const [signature, setSignature] = useState<string>("");
@@ -66,7 +70,7 @@ export default function ConfigureTransaction() {
         transaction = {
           type: selectedTransactionType,
           version,
-          contractAddress: contractAddress,
+          contractAddress: senderAddress,
           calldata: JSON.parse(calldata),
           maxFee,
           signature: JSON.parse(signature),
@@ -125,6 +129,17 @@ export default function ConfigureTransaction() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // useEffect(() => {
+  //   if (contractAddress && contractAddress != "") {
+  //     getContractData();
+  //   }
+  // }, [contractAddress]);
+
+  const getContractData = async () => {
+    const contractDetails = await getContractInfo(contractAddress);
+    setContractDetails(contractDetails);
   };
 
   return (
@@ -295,6 +310,7 @@ export default function ConfigureTransaction() {
               ))}
             </div>
           </div>
+
           <div className="space-y-2">
             <div>Version</div>
             <Input
@@ -302,6 +318,14 @@ export default function ConfigureTransaction() {
               placeholder="e.g: 3"
               value={version}
               onChange={(e) => setVersion(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <div>Sender Address</div>
+            <Input
+              placeholder="e.g: 0x0000000000000000000000000000000000000000000"
+              value={senderAddress}
+              onChange={(e) => setSenderAddress(e.target.value)}
             />
           </div>
 
@@ -312,7 +336,7 @@ export default function ConfigureTransaction() {
                 <Input
                   placeholder="e.g: 0x0000000000000000000000000000000000000000000"
                   value={entrypoint}
-                  onChange={(e) => setContractAddress(e.target.value)}
+                  onChange={(e) => setEntrypoint(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -332,15 +356,6 @@ export default function ConfigureTransaction() {
 
           {selectedTransactionType === TransactionType.DECLARE && (
             <div className="space-y-4">
-              <div className="space-y-2">
-                <div>Sender Address</div>
-                <Input
-                  placeholder="e.g: 0x0000000000000000000000000000000000000000000"
-                  value={senderAddress}
-                  onChange={(e) => setSenderAddress(e.target.value)}
-                />
-              </div>
-
               <div className="space-y-2">
                 <div>Compiled Hash</div>
                 <Input

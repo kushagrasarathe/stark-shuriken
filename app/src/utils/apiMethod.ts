@@ -1,5 +1,6 @@
 import { AllSimulationRespone, SimulationResponse } from "@/types";
 import { SimulateTransactionArgs } from "./nethermindRPCMethod";
+import { ClassDetailType, ContractDetailType } from "./voyagerAPIMethod";
 
 export const startSimulateTransaction = async ({
   blockId,
@@ -61,6 +62,25 @@ export const getAllSimulated = async () => {
       allKeysBasicData: AllSimulationRespone;
     };
 
+    console.log(data);
+    return data;
+  } catch (error: any) {
+    console.log(error);
+  }
+};
+
+export const getContractInfo = async (
+  contractAddress: string
+): Promise<(ContractDetailType & ClassDetailType) | undefined> => {
+  try {
+    const response = await fetch(
+      `/api/contract?contractAddress=${contractAddress}`,
+      {
+        method: "GET",
+      }
+    );
+
+    const data = await response.json();
     console.log(data);
     return data;
   } catch (error: any) {
