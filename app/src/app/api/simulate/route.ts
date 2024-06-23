@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     // 4. Get the result , and send it to the parsing API
     const { tx, error, isSuccess } = simulateResponse;
     // console.log(tx, error, isSuccess);
-    fetch(`${process.env.HOST_URL}/api/parse`, {
+    await fetch(`${process.env.HOST_URL}/api/parse`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -66,6 +66,8 @@ export async function POST(request: NextRequest) {
 
     // 5. Store in the kv
     await kv.set(requestId, {
+      simulateArgs: body,
+      timestamp: Date.now(),
       tx,
       error: error?.message,
       isSuccess,

@@ -29,7 +29,7 @@ export default function Home() {
     // });
 
     await startSimulateTransaction({
-      blockId: 75682,
+      blockId: "75682",
       transaction: {
         type: TransactionType.INVOKE,
         version: "0x1",
