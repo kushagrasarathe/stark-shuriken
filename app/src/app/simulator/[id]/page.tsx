@@ -19,6 +19,7 @@ export default function SimulationDetails() {
   const simulationId = path.split("/")[2];
   const [simulationDetails, setSimulationDetails] =
     useState<null | SimulationResponse>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const renderKeyValuePairs = (obj: DataObject) => {
     return Object.entries(obj).map(([key, value]) => (
@@ -29,17 +30,31 @@ export default function SimulationDetails() {
   };
 
   useEffect(() => {
-    const data = getSimulateTransactionResponse(simulationId);
-
-    if (data) {
-      data.then((data) => {
+    const fetchData = async () => {
+      try {
+        const data = await getSimulateTransactionResponse(simulationId);
         if (data) {
           setSimulationDetails(data as SimulationResponse);
         }
-      });
-    }
-    // console.log({ simulationDetails }, simulationDetails?.isSuccess);
-  }, []);
+      } catch (error) {
+        console.error("Error fetching simulation details:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [simulationId]);
+
+  if (isLoading) {
+    return (
+      <Card className="w-full rounded-lg p-2 bg-indigo-500/5">
+        <CardContent className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading simulation details...</div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full rounded-lg p-2 bg-indigo-500/5">
@@ -48,14 +63,6 @@ export default function SimulationDetails() {
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* <div className="space-y-1">
-          <span className="text-sm text-neutral-500">Hash</span>
-          <div className="flex items-center gap-2">
-            <span className="text-base tracking-wide">
-              transaction Hash here
-            </span>
-          </div>
-        </div> */}
         <div className="flex items-center justify-between md:max-w-xl">
           <div className="space-y-1">
             <div className="text-sm text-neutral-500">TYPE</div>

@@ -1,4 +1,5 @@
 "use client";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -8,29 +9,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatTimestamp } from "@/lib/utils";
 import { getAllSimulated } from "@/utils/apiMethod";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-interface TransactionRequestIds {
-  requestIds: string[];
+interface RequestData {
+  requestId: string;
+  timestamp: number;
+  isSuccess: boolean;
+}
+
+interface AllKeysBasicData {
+  allKeysBasicData: RequestData[];
 }
 
 export default function Page() {
   const [allTransactions, setAllTransactions] =
-    useState<TransactionRequestIds | null>(null);
+    useState<AllKeysBasicData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   async function getAllSimulations() {
-    const data = await getAllSimulated();
-    if (data) {
-      setAllTransactions(data);
+    try {
+      const data = await getAllSimulated();
+      if (data) {
+        setAllTransactions(data);
+      }
+    } catch (error) {
+      console.error("Error fetching simulations:", error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   useEffect(() => {
-    if (!allTransactions) {
-      getAllSimulations();
-    }
+    getAllSimulations();
   }, []);
 
   return (
@@ -40,28 +54,48 @@ export default function Page() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Invoice</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {allTransactions?.requestIds.map((item, idx) => (
-              <TableRow key={idx}>
-                <TableCell className="font-medium">
-                  <Link href={`/simulator/${23}`}>item</Link>
-                </TableCell>
-                <TableCell>Paid</TableCell>
-                <TableCell>Credit Card</TableCell>
-                <TableCell className="text-right">$250.00</TableCell>
+        {isLoading ? (
+          <div className="w-full flex items-center justify-center">
+            <Loader2 className="animate-spin size-5" />
+          </div>
+        ) : allTransactions?.allKeysBasicData?.length ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]"></TableHead>
+                <TableHead className="">Simulation ID</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Time</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {allTransactions.allKeysBasicData.map((item, idx) => (
+                <TableRow key={idx}>
+                  <TableCell className="font-medium">{idx + 1}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link href={`/simulator/${item.requestId}`}>
+                      {item.requestId}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    {item.isSuccess ? (
+                      <Badge variant={"default"} className="bg-green-500">
+                        Success
+                      </Badge>
+                    ) : (
+                      <Badge variant={"outline"} className="bg-red-500">
+                        Failed
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>{formatTimestamp(item.timestamp)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="text-center py-4">No simulations found.</div>
+        )}
       </CardContent>
     </Card>
   );

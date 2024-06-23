@@ -6,6 +6,7 @@ import { NextRequest } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { SimulatedTransaction } from "starknet";
 import { kv } from "@vercel/kv";
+import { AllSimulationRespone } from "@/types";
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,7 +28,23 @@ export async function GET(request: NextRequest) {
     } else {
       const allKeys = await kv.keys(`simulate:*`);
 
-      return new Response(JSON.stringify({ requestIds: allKeys }), {
+      const allKeysData = (await kv.mget(allKeys)) as Object[];
+
+      const allKeysBasicData: AllSimulationRespone = [];
+
+      allKeys.map((key, index) => {
+        const data = {
+          requestId: key.replace("simulate:", ""),
+          //@ts-ignore
+          timestamp: allKeysData[index].timestamp,
+          //@ts-ignore
+          isSuccess: allKeysData[index].isSuccess,
+        };
+
+        allKeysBasicData.push(data);
+      });
+
+      return new Response(JSON.stringify({ allKeysBasicData }), {
         status: 200,
       });
     }

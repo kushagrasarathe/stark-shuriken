@@ -3,6 +3,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { startSimulateTransaction } from "@/utils/apiMethod";
 import { SimulateTransactionArgs } from "@/utils/nethermindRPCMethod";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AccountInvocationItem, TransactionType } from "starknet";
@@ -52,69 +53,75 @@ export default function ConfigureTransaction() {
   const [nonce, setNonce] = useState<string>("0x0");
   const [maxFee, setMaxFee] = useState<string>("0x0");
   const [version, setVersion] = useState<string>("0x1");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
-    // Perform form submission logic here
+    setIsLoading(true);
+    try {
+      let transaction: AccountInvocationItem;
 
-    let transaction: AccountInvocationItem;
-
-    if (selectedTransactionType === TransactionType.INVOKE) {
-      transaction = {
-        type: selectedTransactionType,
-        version,
-        contractAddress: contractAddress,
-        calldata: JSON.parse(calldata),
-        maxFee,
-        signature: JSON.parse(signature),
-        nonce,
-      };
-    } else if (selectedTransactionType === TransactionType.DECLARE) {
-      transaction = {
-        type: selectedTransactionType,
-        contract: {
-          program: "",
-          entry_points_by_type: {
-            CONSTRUCTOR: [],
-            L1_HANDLER: [],
-            EXTERNAL: [],
+      if (selectedTransactionType === TransactionType.INVOKE) {
+        transaction = {
+          type: selectedTransactionType,
+          version,
+          contractAddress: contractAddress,
+          calldata: JSON.parse(calldata),
+          maxFee,
+          signature: JSON.parse(signature),
+          nonce,
+        };
+      } else if (selectedTransactionType === TransactionType.DECLARE) {
+        transaction = {
+          type: selectedTransactionType,
+          contract: {
+            program: "",
+            entry_points_by_type: {
+              CONSTRUCTOR: [],
+              L1_HANDLER: [],
+              EXTERNAL: [],
+            },
+            abi: [],
           },
-          abi: [],
-        },
-        senderAddress,
-        compiledClassHash: compiledHash,
-        signature: signature.split(","),
-        nonce,
-      };
-    } else {
-      transaction = {
-        type: selectedTransactionType,
-        version,
-        classHash,
-        constructorCalldata: JSON.parse(constructorCalldata),
-        addressSalt,
-        maxFee,
-        signature: JSON.parse(signature),
-        nonce,
-      };
-    }
+          senderAddress,
+          compiledClassHash: compiledHash,
+          signature: signature.split(","),
+          nonce,
+        };
+      } else {
+        transaction = {
+          type: selectedTransactionType,
+          version,
+          classHash,
+          constructorCalldata: JSON.parse(constructorCalldata),
+          addressSalt,
+          maxFee,
+          signature: JSON.parse(signature),
+          nonce,
+        };
+      }
 
-    console.log(transaction);
-    const simulateParams: SimulateTransactionArgs = {
-      blockId: usePendingBlock ? "latest" : blockNumber,
-      transaction: transaction,
-      skipExecute: skipFlags,
-      skipFeeCharge: skipFlags,
-      skipValidate: skipFlags,
-    };
-    console.log(simulateParams);
-    const response = await startSimulateTransaction(simulateParams);
+      console.log(transaction);
+      const simulateParams: SimulateTransactionArgs = {
+        blockId: usePendingBlock ? "latest" : blockNumber,
+        transaction: transaction,
+        skipExecute: skipFlags,
+        skipFeeCharge: skipFlags,
+        skipValidate: skipFlags,
+      };
+      console.log(simulateParams);
+      const response = await startSimulateTransaction(simulateParams);
 
-    if (response) {
-      const requestId = response.requestId;
-      console.log(requestId);
-      router.push(`/simulate/${requestId}`);
-    } else {
-      console.log("error");
+      if (response) {
+        const requestId = response.requestId;
+        console.log(requestId);
+        router.push(`/simulate/${requestId}`);
+      } else {
+        console.log("error");
+      }
+    } catch (error) {
+      console.error("Error simulating transaction:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -407,8 +414,20 @@ export default function ConfigureTransaction() {
           </div>
         </CardContent>
         <div className="px-6 pb-4">
-          <Button variant={"default"} onClick={handleSubmit} className="w-full">
-            Simulate Transaction
+          <Button
+            variant={"default"}
+            onClick={handleSubmit}
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="size-4 animate-spin" />
+                <div>Simulating...</div>
+              </div>
+            ) : (
+              "Simulate Transaction"
+            )}
           </Button>
         </div>
       </Card>

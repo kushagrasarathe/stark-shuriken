@@ -14,7 +14,7 @@ type DataFormats = {
 export function formatTimestamp(timestamp: number): string {
   const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
   const now = Date.now();
-  const diffInSeconds = Math.floor((now - timestamp * 1000) / 1000);
+  const diffInSeconds = Math.floor((now - timestamp) / 1000); // timestamp is in milliseconds
 
   const times = [
     { unit: "year", value: 60 * 60 * 24 * 365 },

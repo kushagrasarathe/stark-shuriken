@@ -21,3 +21,9 @@ export type SimulationResponse = {
     variables?: { [key: string]: any };
   };
 };
+
+export type AllSimulationRespone = {
+  requestId: string;
+  timestamp: number;
+  isSuccess: boolean;
+}[];

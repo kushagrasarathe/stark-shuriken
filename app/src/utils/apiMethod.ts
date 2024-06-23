@@ -1,4 +1,4 @@
-import { SimulationResponse } from "@/types";
+import { AllSimulationRespone, SimulationResponse } from "@/types";
 import { SimulateTransactionArgs } from "./nethermindRPCMethod";
 
 export const startSimulateTransaction = async ({
@@ -57,7 +57,9 @@ export const getAllSimulated = async () => {
       method: "GET",
     });
 
-    const data = (await response.json()) as { requestIds: string[] };
+    const data = (await response.json()) as {
+      allKeysBasicData: AllSimulationRespone;
+    };
 
     console.log(data);
     return data;
