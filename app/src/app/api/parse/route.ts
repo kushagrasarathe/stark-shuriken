@@ -1,6 +1,10 @@
-import { parseErrorMessageWithLLM } from "@/utils/openAIMethod";
+import {
+  parseErrorMessageWithLLM,
+  parseTransactionWithLLM,
+} from "@/utils/openAIMethod";
 import { NextRequest } from "next/server";
 import { kv } from "@vercel/kv";
+import { SimulatedTransaction } from "starknet";
 
 export async function GET(request: NextRequest) {
   try {
@@ -36,7 +40,12 @@ export async function POST(request: NextRequest) {
     console.log("Parsing the request...");
 
     // 1. Take in the result
-    const { requestId, tx, error, isSuccess } = body;
+    const { requestId, tx, error, isSuccess } = body as {
+      requestId: string;
+      tx: SimulatedTransaction;
+      error: string | null;
+      isSuccess: boolean;
+    };
 
     let executionError: string | null;
     let llmResponseJson:
@@ -83,15 +92,28 @@ export async function POST(request: NextRequest) {
           message: "No execution error found in the error message.",
         };
       }
-
-      // 4a. Get the information for the addresses present in the error message
-      if (llmResponseJson.variables) {
-        // Get the information for the addresses present in the error message
-      }
     } else {
       // 2b. If success , then parse using Voyager API
       // 3b. Get the information for the addresses present in the success message
+
       // Finally pass it to chatGPT for making sense of it
+      const llmResponse = await parseTransactionWithLLM(tx);
+      if (llmResponse) {
+        llmResponseJson = JSON.parse(llmResponse) as {
+          message: string;
+          variables: { [key: string]: any };
+        };
+        console.log(llmResponseJson);
+      } else {
+        llmResponseJson = {
+          message: "No valid response from the LLM model.",
+        };
+      }
+    }
+
+    // 4a. Get the information for the addresses present in the error message
+    if (llmResponseJson.variables) {
+      // Get the information for the addresses present in the error message
     }
 
     // 5. Store the response back in the KV
