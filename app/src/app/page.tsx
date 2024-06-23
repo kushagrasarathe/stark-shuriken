@@ -7,7 +7,7 @@ import { TransactionType } from "starknet";
 export default function Home() {
   const handleSimulate = async () => {
     await startSimulateTransaction({
-      blockId: "75682",
+      blockId: "latest",
       transaction: {
         type: TransactionType.INVOKE,
         version: "0x1",
@@ -22,12 +22,12 @@ export default function Home() {
           "0x01",
           "0x00",
         ],
-        maxFee: "0x0",
+        maxFee: "0xaf9e7a00a66",
         signature: [
           "0x565da8b0a0b6437b8194dfac8dcd853c9f45dce495e49414209a80992f91696",
           "0x3ee9bdc4326d57df85d4c97a9ecaddbdb63937aa35b19092c11594e05aee9c3",
         ],
-        nonce: "0xc3",
+        nonce: "0xcc",
       },
       skipExecute: false,
       skipFeeCharge: false,
@@ -38,15 +38,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <ConfigureTransaction />
-      {/* <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <button onClick={handleSimulate}>Simulate</button>
-        </div>
-      </div> */}
+      <button onClick={handleSimulate}>Simulate</button>
     </main>
   );
 }
