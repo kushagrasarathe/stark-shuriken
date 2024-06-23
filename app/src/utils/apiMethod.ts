@@ -1,3 +1,4 @@
+import { SimulationResponse } from "@/types";
 import { SimulateTransactionArgs } from "./nethermindRPCMethod";
 
 export const startSimulateTransaction = async ({
@@ -27,6 +28,36 @@ export const startSimulateTransaction = async ({
     const data = await response.json();
     console.log(data);
     return data as { reqId: string };
+  } catch (error: any) {
+    console.log(error);
+  }
+};
+
+export const getSimulateTransactionResponse = async (
+  requestId: string
+): Promise<SimulationResponse | undefined> => {
+  try {
+    const response = await fetch(`/api/simulate?requestId=${requestId}`, {
+      method: "GET",
+    });
+
+    const data = await response.json();
+    console.log(data);
+    return data as SimulationResponse;
+  } catch (error: any) {
+    console.log(error);
+  }
+};
+
+export const getAllSimualated = async () => {
+  try {
+    const response = await fetch(`/api/simulate`, {
+      method: "GET",
+    });
+
+    const data = (await response.json()) as { requestIds: string[] };
+    console.log(data);
+    return data;
   } catch (error: any) {
     console.log(error);
   }

@@ -12,23 +12,25 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const requestId: string | null = searchParams.get("requestId");
 
-    if (!requestId) {
-      return new Response("Invalid Request", {
-        status: 400,
+    if (requestId) {
+      const simulationRequest = await kv.get(`simulate:${requestId}`);
+
+      if (!simulationRequest) {
+        return new Response("Request Not Found", {
+          status: 404,
+        });
+      }
+
+      return new Response(JSON.stringify(simulationRequest), {
+        status: 200,
+      });
+    } else {
+      const allKeys = await kv.keys(`simulate:*`);
+
+      return new Response(JSON.stringify({ requestIds: allKeys }), {
+        status: 200,
       });
     }
-
-    const simulationRequest = await kv.get(requestId);
-
-    if (!simulationRequest) {
-      return new Response("Request Not Found", {
-        status: 404,
-      });
-    }
-
-    return new Response(JSON.stringify(simulationRequest), {
-      status: 200,
-    });
   } catch (error: any) {
     return new Response(error, { status: 500 });
   }
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
     });
 
     // 5. Store in the kv
-    await kv.set(requestId, {
+    await kv.set(`simulate:${requestId}`, {
       simulateArgs: body,
       timestamp: Date.now(),
       tx,

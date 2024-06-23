@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const simulationRequest = await kv.get(requestId);
+    const simulationRequest = await kv.get(`simulate:${requestId}`);
 
     if (!simulationRequest) {
       return new Response("Request Not Found", {
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Store the response back in the KV
-    const requestData = await kv.get(requestId);
+    const requestData = await kv.get(`simulate:${requestId}`);
     if (requestData && llmResponseJson) {
       const updatedRequestData = {
         ...requestData,
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       };
 
       console.log("Updated Request Data:", updatedRequestData);
-      await kv.set(requestId, JSON.stringify(updatedRequestData));
+      await kv.set(`simulate:${requestId}`, JSON.stringify(updatedRequestData));
     }
 
     return new Response("Parsing & decoding complete", { status: 200 });
